@@ -14,6 +14,7 @@ public class UserController : ControllerBase
         this.context = context;
     }
 
+    #region Http Methods
     [HttpPost("register")]
     public async Task<IActionResult> Register(UserRegisterRequest request)
     {
@@ -38,6 +39,29 @@ public class UserController : ControllerBase
         return Ok("User successfully created");
     }
 
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(UserLoginRequest request)
+    {
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+        if(user == null)
+        {
+            return BadRequest("User Not Found");
+        }
+
+        if(user.VerifiedAt == null)
+        {
+            return BadRequest("Not verified");
+        }
+
+        if (!VerifiedPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+        {
+            return BadRequest("Wrong password");
+        }
+    }
+
+    #endregion
+
     private string CreateRandomToken()
     {
         return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
@@ -49,6 +73,16 @@ public class UserController : ControllerBase
         {
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        }
+    }
+
+    private bool VerifyPasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+    {
+        using(var hmac = new HMACSHA512(passwordSalt))
+        {
+            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+
+            return computedHash.SequenceEqual(passwordHash);
         }
     }
 }
