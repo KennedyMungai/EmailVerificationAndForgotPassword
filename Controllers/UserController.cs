@@ -54,10 +54,12 @@ public class UserController : ControllerBase
             return BadRequest("Not verified");
         }
 
-        if (!VerifiedPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+        if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
         {
             return BadRequest("Wrong password");
         }
+
+        return Ok($"Welcome Back, {user.Email}");
     }
 
     #endregion
