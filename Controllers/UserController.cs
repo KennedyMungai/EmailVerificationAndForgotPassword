@@ -62,6 +62,21 @@ public class UserController : ControllerBase
         return Ok($"Welcome Back, {user.Email}");
     }
 
+    [HttpPost("verify")]
+    public async Task<IActionResult> Verify(string token)
+    {
+        var user = await context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
+
+        if(user == null)
+        {
+            return BadRequest("Invalid token");
+        }
+
+        user.VerifiedAt = DateTime.Now;
+        await context.SaveChangesAsync();
+
+        return Ok("User verified");
+    }
     #endregion
 
     private string CreateRandomToken()
