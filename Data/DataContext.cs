@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 
-using EmailVerificationAndForgotPassword.Models;
-
 namespace EmailVerificationAndForgotPassword.Data;
 
 public class DataContext : DbContext
