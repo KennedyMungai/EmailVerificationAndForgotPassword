@@ -1,3 +1,4 @@
+global using Microsoft.EntityFrameworkCore;
 global using EmailVerificationAndForgotPassword.Data;
 global using EmailVerificationAndForgotPassword.Models;
 
